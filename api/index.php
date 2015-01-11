@@ -8,58 +8,42 @@ $conf = (object) [
     "wordsFilepath" => __DIR__ . "/words.json",
 ];
 $pdo = new \PDO("sqlite:{$conf->databaseFilepath}");
+$hangman = new \Hangman\Hangman($pdo, $conf->wordsFilepath);
 
-// Start a new game
-$app->post('/games', function () use ($pdo, $conf) {
-    $game = new \Hangman\Game($pdo);
-    if (!is_file($conf->wordsFilepath)) {
-        throw new \Exception("words file cannot be found"); //500
-    }
-    $wordsJson = file_get_contents($conf->wordsFilepath);
-    $words = json_decode($conf->wordsFilepath);
-    if (empty($words) || empty($words->words)) {
-        throw new \Exception("no words"); //500
-    }
-    $word = $words->words[mt_rand() % count($words->words)];
-    $game->create($word);
-    return $game;
+/**
+ * Start a new game.
+ */
+$app->post('/games', function () use ($hangman) {
+    return $hangman->startGame();
 });
 
-// Overview of all games
-$app->get('/games', function () use ($pdo) {
-    $games = new \Hangman\Games($pdo);
-    $games->load();
-    return $games;
+/**
+ * Overview of all games.
+ */
+$app->get('/games', function () use ($hangman) {
+    return $hangman->listGames();
 });
 
-// Get a specific game
-$app->get('/games/:id', function ($id) use ($pdo) {
-    $game = new \Hangman\Game($pdo);
-    $game->load($id);
-    return $game;
+/**
+ * Get a specific game.
+ */
+$app->get('/games/:id', function ($id) use ($hangman) {
+    return $hangman->getGame($id);
 });
 
-// Guessing a letter
-$app->post('/games/:id', function ($id) use ($pdo, $app) {
-    $game = new \Hangman\Game($pdo);
-    $game->load($id);
-    if ($game->getStatus() === \Hangman\Game::STATUS_BUSY) {
-        throw new Exception(); // Precondition failed, game closed
-    }
-    $body = $app->request->getBody();
-    parse_str($body, $params);
+/**
+ * Guessing a letter.
+ */
+$app->post('/games/:id', function ($id) use ($app, $hangman) {
+    parse_str($app->request->getBody(), $params);
     if (empty($params["char"])) {
-        throw new Exception(); // Precondition failed, no char
+        throw new Exception("precondition failed, no char");
     }
     $char = $params["char"];
     if (!is_string($char) || !preg_match("/^[a-z]$/", $char)) {
-        throw new Exception(); // Illegal input for char
+        throw new Exception("illegal input value for char");
     }
-    $result = $game->guess($char);
-    return [
-        "result" => $result,
-        "game" => $game
-    ];
+    $hangman->guess($id, $char);
 });
 
 $app->run();

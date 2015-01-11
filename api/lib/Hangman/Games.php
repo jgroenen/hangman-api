@@ -5,11 +5,14 @@ namespace Hangman;
 /**
  * Games of Hangman.
  */
-class Games implements \jsonserializable
+class Games implements \jsonSerializable
 {
     private $pdo;
     private $games;
     
+    /**
+     * Constructor for Games of Hangman.
+     */
     public function __construct(\PDO $pdo)
     {
         $this->pdo = $pdo;
@@ -17,7 +20,7 @@ class Games implements \jsonserializable
     }
     
     /**
-     * 
+     * Loads all games.
      */
     public function load()
     {
@@ -31,7 +34,8 @@ class Games implements \jsonserializable
     }
     
     /**
-     * 
+     * See jsonSerializable interface specification.
+     * @returns Array
      */
     public function jsonSerialize()
     {

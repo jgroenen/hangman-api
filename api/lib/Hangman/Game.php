@@ -5,7 +5,7 @@ namespace Hangman;
 /**
  * Game of Hangman.
  */
-class Game implements \jsonserializable
+class Game implements \jsonSerializable
 {
     const STATUS_BUSY = "busy";
     const STATUS_FAIL = "fail";
@@ -82,7 +82,7 @@ class Game implements \jsonserializable
     
     /**
      * Guesses a character in the word.
-     * @param char $char
+     * @param string $char
      * @returns RESULT_SUCCESS || RESULT_FAIL
      */
     public function guess($char)
@@ -161,7 +161,8 @@ class Game implements \jsonserializable
     }
     
     /**
-     * Returns the fields that should show up in the json.
+     * See jsonSerializable interface specification.
+     * @returns Array
      */
     public function jsonSerialize()
     {
