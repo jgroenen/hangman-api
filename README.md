@@ -1,7 +1,7 @@
 # hangman-api
 Small web service for playing a game of hangman.
 
-#Implement “hangman”
+# Implement “hangman”
 
 Method | URL | Request | Response | Description
 --- | --- | --- | --- | --- |
@@ -15,8 +15,8 @@ Method | URL | Request | Response | Description
 * Guessing a correct letter doesn’t decrement the amount of tries left
 * Only valid characters are a-z
 * At the start of the game a random word should be picked from this list
-* 
-#Running
+
+# Running
 
 To run, you need to:
 
