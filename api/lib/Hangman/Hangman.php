@@ -67,7 +67,6 @@ class Hangman
      * Guesses a character in Hangman Game with $id.
      * @param int $id
      * @param string $char
-     * @throws \Exception
      * @returns Array
      */
     public function guess($id, $char)
