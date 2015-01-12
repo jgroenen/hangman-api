@@ -11,6 +11,7 @@ class Game implements \jsonSerializable
     const STATUS_FAIL = "fail";
     const STATUS_SUCCESS = "success";
     
+    const RESULT_GAME_CLOSED = "game closed";
     const RESULT_FAIL = "fail";
     const RESULT_SUCCESS = "success";
     
@@ -22,6 +23,22 @@ class Game implements \jsonSerializable
     private $guessed;
     private $triesLeft;
     private $status;
+    
+    /**
+     * Returns the id.
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+    
+    /**
+     * Returns the status.
+     */
+    public function getStatus()
+    {
+        return $this->status;
+    }
     
     /**
      * Constructs a game.
@@ -60,10 +77,12 @@ class Game implements \jsonSerializable
         ";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([
-            "id" => $id
+            ":id" => $id
         ]);
-        $gameValues = $this->pdo->fetch(\PDO::FETCH_ASSOC);
-        $this->loadGameFromArray($gameValues);
+        $gameValues = $stmt->fetch(\PDO::FETCH_ASSOC);
+        if ($gameValues) {
+            $this->loadGameFromArray($gameValues);
+        }
     }
     
     /**
@@ -73,10 +92,9 @@ class Game implements \jsonSerializable
     public function create($word)
     {
         $this->word = $word;
-        $this->guessed = str_repeat(".", count($word));
+        $this->guessed = str_repeat(".", strlen($word));
         $this->triesLeft = 10;
         $this->status = self::STATUS_BUSY;
-        
         $this->save();
     }
     
@@ -87,7 +105,7 @@ class Game implements \jsonSerializable
      */
     public function guess($char)
     {
-        $L = count($this->word);
+        $L = strlen($this->word);
         $result = self::RESULT_FAIL;
         $dots = 0;
         for ($i = 0; $i < $L; ++$i) {
@@ -121,21 +139,27 @@ class Game implements \jsonSerializable
      */
     private function save()
     {
-        if (empty($this->attrs["id"])) {
+        if (empty($this->id)) {
             $sql = "
-                INSERT INTO games
-                SET
-                    word = :word,
-                    guessed = :guessed,
-                    tries_left = :triesLeft,
-                    status = :status
+                INSERT INTO games (
+                    word,
+                    guessed,
+                    triesLeft,
+                    status
+                )
+                VALUES (
+                    :word,
+                    :guessed,
+                    :triesLeft,
+                    :status
+                )
             ";
             $stmt = $this->pdo->prepare($sql);
             $stmt->execute([
-                "word" => $this->word,
-                "guessed" => $this->guessed,
-                "triesLeft" => $this->triesLeft,
-                "status" => $this->status
+                ":word" => $this->word,
+                ":guessed" => $this->guessed,
+                ":triesLeft" => $this->triesLeft,
+                ":status" => $this->status
             ]);
             $this->id = $this->pdo->lastInsertId();
         } else {
@@ -144,18 +168,18 @@ class Game implements \jsonSerializable
                 SET
                     word = :word,
                     guessed = :guessed,
-                    tries_left = :triesLeft,
+                    triesLeft = :triesLeft,
                     status = :status
                 WHERE
                     id = :id
             ";
             $stmt = $this->pdo->prepare($sql);
             $stmt->execute([
-                "word" => $this->word,
-                "guessed" => $this->guessed,
-                "triesLeft" => $this->triesLeft,
-                "status" => $this->status,
-                "id" => $this->id
+                ":word" => $this->word,
+                ":guessed" => $this->guessed,
+                ":triesLeft" => $this->triesLeft,
+                ":status" => $this->status,
+                ":id" => $this->id
             ]);
         }
     }
@@ -167,10 +191,10 @@ class Game implements \jsonSerializable
     public function jsonSerialize()
     {
         return [
-            "id" => $this->attrs["id"],
-            "word" => $this->attrs["guessed"],
-            "tries_left" => $this->attrs["triesLeft"],
-            "status" => $this->attrs["status"]
+            "id" => $this->id,
+            "word" => $this->guessed,
+            "triesLeft" => $this->triesLeft,
+            "status" => $this->status
         ];
     }
 }

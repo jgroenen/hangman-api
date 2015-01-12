@@ -1,34 +1,44 @@
 <?php
 
+ini_set('error_reporting', E_ALL);
+ini_set('display_errors', 'On');
+
 require 'vendor/autoload.php';
 
 $app = new \Slim\Slim();
+$app->response->headers->set('Content-Type', 'application/json');
+
 $conf = (object) [
-    "databaseFilepath" => __DIR__ . "/games.sdb",
+    "databaseFilepath" => __DIR__ . "/database/games.sdb",
     "wordsFilepath" => __DIR__ . "/words.json",
 ];
-$pdo = new \PDO("sqlite:{$conf->databaseFilepath}");
+
+$pdo = new PDO("sqlite:{$conf->databaseFilepath}");
 $hangman = new \Hangman\Hangman($pdo, $conf->wordsFilepath);
 
 /**
  * Start a new game.
  */
 $app->post('/games', function () use ($hangman) {
-    return $hangman->startGame();
+    echo json_encode($hangman->startGame());
 });
 
 /**
  * Overview of all games.
  */
 $app->get('/games', function () use ($hangman) {
-    return $hangman->listGames();
+    echo json_encode($hangman->listGames());
 });
 
 /**
  * Get a specific game.
  */
-$app->get('/games/:id', function ($id) use ($hangman) {
-    return $hangman->getGame($id);
+$app->get('/games/:id', function ($id) use ($app, $hangman) {
+    $game = $hangman->getGame($id);
+    if (!$game->getId()) {
+        $app->halt(404, "Game Not Found");
+    }
+    echo json_encode($game);
 });
 
 /**
@@ -37,13 +47,13 @@ $app->get('/games/:id', function ($id) use ($hangman) {
 $app->post('/games/:id', function ($id) use ($app, $hangman) {
     parse_str($app->request->getBody(), $params);
     if (empty($params["char"])) {
-        throw new Exception("precondition failed, no char");
+        $app->halt(412, "missing parameter char");
     }
     $char = $params["char"];
     if (!is_string($char) || !preg_match("/^[a-z]$/", $char)) {
-        throw new Exception("illegal input value for char");
+        $app->halt(412, "illegal input value for parameter char");
     }
-    $hangman->guess($id, $char);
+    echo json_encode($hangman->guess($id, $char));
 });
 
 $app->run();

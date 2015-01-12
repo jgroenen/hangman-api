@@ -25,11 +25,11 @@ class Games implements \jsonSerializable
     public function load()
     {
         $sql = "SELECT * FROM games";
-        $this->pdo->query(\PDO::FETCH_ASSOC);
-        $results = $this->pdo->fetchAll(\PDO::FETCH_ASSOC);
+        $stmt = $this->pdo->query($sql);
+        $results = $stmt->fetchAll(\PDO::FETCH_ASSOC);
         $this->games = [];
         foreach($results as $result) {
-            $this->games[] = new Game($pdo, $result);
+            $this->games[] = new Game($this->pdo, $result);
         }
     }
     
@@ -40,7 +40,7 @@ class Games implements \jsonSerializable
     public function jsonSerialize()
     {
         return [
-            "games" => $this->games;
+            "games" => $this->games,
         ];
     }
 }

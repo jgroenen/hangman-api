@@ -56,7 +56,7 @@ class Hangman
      * @param int $id
      * @returns Game
      */
-    public funtion getGame($id)
+    public function getGame($id)
     {
         $game = new Game($this->pdo);
         $game->load($id);
@@ -74,8 +74,11 @@ class Hangman
     {
         $game = new Game($this->pdo);
         $game->load($id);
-        if ($game->getStatus() === Game::STATUS_BUSY) {
-            throw new \Exception("precondition failed, game closed");
+        if ($game->getStatus() !== Game::STATUS_BUSY) {
+            return [
+                "result" => Game::RESULT_GAME_CLOSED,
+                "game" => $game
+            ];
         }
         $result = $game->guess($char);
         return [
