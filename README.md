@@ -15,3 +15,11 @@ Method | URL | Request | Response | Description
 * Guessing a correct letter doesn’t decrement the amount of tries left
 * Only valid characters are a-z
 * At the start of the game a random word should be picked from this list
+* 
+#Running
+
+To run, you need to:
+
+* create the sqlite3 database running create_db.sh in /api/database
+* get the vendor stuff using composer
+* make sure your server uses the .htaccess
