@@ -11,7 +11,7 @@ Method | URL | Request | Response | Description
 <pre>POST</pre> | <pre>/games/:id</pre> | <pre>char=e</pre> | <pre>{<br/>&nbsp;&nbsp;&nbsp;&nbsp;"result": "success",<br/>&nbsp;&nbsp;&nbsp;&nbsp;"game": {<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"id": 1,<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"word": "awesome",<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"tries_left": 3,<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"status": "success"<br/>&nbsp;&nbsp;&nbsp;&nbsp;}<br/>}</pre> | Guessing a letter
 
 * Game field "status" can be "busy" (game in progress), "fail" (game lost) or "success" (game won)
-* Guess field "result" can be "fail" (letter not in word), "success" (letter in word) or "game closed".
+* Guess field "result" can be "fail" (letter not in word), "success" (letter in word) or "game closed"
 * Guessing a correct letter doesn’t decrement the amount of tries left
 * Only valid characters are a-z
 * At the start of the game a random word should be picked from this list
