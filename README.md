@@ -16,10 +16,14 @@ Method | URL | Request | Response | Description
 * Only valid characters are a-z
 * At the start of the game a random word should be picked from this list
 
-# Running
+# Running the API
 
 To run, you need to:
 
 * create the sqlite3 database running create_db.sh in /api/database
 * get the vendor stuff using composer
 * make sure your server uses the .htaccess
+ 
+# Running the app
+
+* just open the index.html in your browser

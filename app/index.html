@@ -12,10 +12,11 @@
 </head>
 <body>
     <h1>Hangman</h1>
-    <h2 id="word"></h2>
+    <h2>Word: <span id="word"></span></h2>
     <h2>Tries left: <span id="triesLeft"></span></h2>
     <h2 id="status"></h2>
-    <input type="text" name="char" placeholder="char" id="char"/>
+    <p><input type="text" name="char" placeholder="char" id="char"/></p>
+    <p><a href="http://hangman.apitecture.nl/games">View old game data</a></p>
     <script>
         var game,
             url = "http://hangman.apitecture.nl";
