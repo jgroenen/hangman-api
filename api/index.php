@@ -6,6 +6,7 @@ ini_set('display_errors', 'On');
 require 'vendor/autoload.php';
 
 $app = new \Slim\Slim();
+$app->response->headers->set('Access-Control-Allow-Origin', '*');
 $app->response->headers->set('Content-Type', 'application/json');
 
 $conf = (object) [

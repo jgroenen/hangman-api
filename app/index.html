@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Hangman</title>
+    <script src="//code.jquery.com/jquery-2.1.3.min.js"></script>
+    <style>
+        html, body {
+            font-family: Arial;
+            font-size: 100%;
+        }
+    </style>
+</head>
+<body>
+    <h1>Hangman</h1>
+    <h2 id="word"></h2>
+    <h2>Tries left: <span id="triesLeft"></span></h2>
+    <h2 id="status"></h2>
+    <input type="text" name="char" placeholder="char" id="char"/>
+    <script>
+        var game,
+            url = "http://hangman.apitecture.nl";
+        $.ajax({
+            method: "POST",
+            url: url + "/games",
+            success: function (data) {
+                game = data;
+                $("#word").html(game.word);
+                $("#triesLeft").html(game.triesLeft);
+            }
+        });
+        $("#char").keyup(function (e) {
+            var char = $(this).val();
+            $(this).val("");
+            if (game.status !== "busy") {
+                return;
+            }
+            $.ajax({
+                method: "POST",
+                url: url + "/games/" + game.id,
+                data: "char=" + char,
+                success: function (data) {
+                    game = data.game;
+                    $("#word").html(game.word);
+                    $("#triesLeft").html(game.triesLeft);
+                    switch (game.status) {
+                        case "busy":
+                        default:
+                            break;
+                        case "success":
+                            $("#status").html("You won!");
+                            break;
+                        case "fail":
+                            $("#status").html("Try again!");
+                            break;
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
