@@ -3,7 +3,7 @@
 namespace Hangman;
 
 /**
- * Storage Provider for Game of Hangman.
+ * Games Storage Provider for Game of Hangman.
  */
 class GamesStore
 {
