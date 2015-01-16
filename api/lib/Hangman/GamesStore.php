@@ -10,17 +10,18 @@ class GamesStore
     private $pdo;
     
     /**
-     * Constructs a Games Store for Hangman Games.
+     * Setter for PDO.
      * @param PDO $pdo
      */
-    public function __construct(\PDO $pdo)
+    public function setPdo(\PDO $pdo)
     {
         $this->pdo = $pdo;
     }
     
     /**
-     * Fetches Hangman Games.
+     * Fetches all Games or Game with $id.
      * @param int $id
+     * @returns Array
      */
     public function fetch($id = null)
     {
@@ -28,8 +29,9 @@ class GamesStore
     }
     
     /**
-     * Fetches one Hangman Games.
+     * Fetches one Game.
      * @param int $id
+     * @returns Array
      */
     private function fetchOne($id)
     {
@@ -46,7 +48,8 @@ class GamesStore
     }
     
     /**
-     * Fetches all Hangman Games.
+     * Fetches all Games.
+     * @returns Array
      */
     private function fetchAll()
     {
@@ -56,7 +59,7 @@ class GamesStore
     }
     
     /**
-     * Save a Hangman Game.
+     * Saves Game.
      * @param Game $game
      */
     public function save(Game $game)
@@ -69,7 +72,7 @@ class GamesStore
     }
     
     /**
-     * Saves a new Game.
+     * Saves new Game.
      * @param Game $game
      */
     private function saveNew(Game $game)
@@ -99,7 +102,7 @@ class GamesStore
     }
     
     /**
-     * Saves an existing Game.
+     * Saves existing Game.
      * @param Game $game
      */
     private function saveExisting(Game $game)

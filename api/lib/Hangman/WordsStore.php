@@ -10,16 +10,17 @@ class WordsStore
     private $wordsFilepath;
     
     /**
-     * Constructs a Games Store for Hangman Games.
+     * Setter for words filepath.
      * @param string $wordsFilepath
      */
-    public function __construct($wordsFilepath)
+    public function setWordsFilepath($wordsFilepath)
     {
         $this->wordsFilepath = $wordsFilepath;
     }
     
     /**
      * Gets a random word.
+     * @returns string
      */
     public function getRandomWord()
     {

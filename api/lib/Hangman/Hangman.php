@@ -11,18 +11,25 @@ class Hangman
     private $wordsStore;
     
     /**
-     * Constructor for Hangman.
+     * Setter for Games Store.
      * @param GamesStore $gamesStore
-     * @param WordsStore $wordsStore
      */
-    public function __construct(GamesStore $gamesStore, WordsStore $wordsStore)
+    public function setGamesStore(GamesStore $gamesStore)
     {
         $this->gamesStore = $gamesStore;
+    }
+    
+    /**
+     * Setter for Words Store.
+     * @param WordsStore $wordsStore
+     */
+    public function setWordsStore(WordsStore $wordsStore)
+    {
         $this->wordsStore = $wordsStore;
     }
     
     /**
-     * Starts a Hangman Game.
+     * Starts a Game.
      * @returns Game
      */
     public function startGame()
@@ -32,7 +39,7 @@ class Hangman
     }
     
     /**
-     * Lists all Hangman Games.
+     * Lists all Games.
      * @returns Games
      */
     public function listGames()
@@ -42,7 +49,7 @@ class Hangman
     }
     
     /**
-     * Gets a Hangman Game with $id
+     * Gets a Game with $id
      * @param int $id
      * @returns Game
      */

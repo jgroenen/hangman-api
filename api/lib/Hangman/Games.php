@@ -11,7 +11,8 @@ class Games implements \jsonSerializable
     private $games;
     
     /**
-     * Constructor for Games of Hangman.
+     * Constructor for Games.
+     * @param GamesStore $gamesStore
      */
     public function __construct(GamesStore $gamesStore)
     {
@@ -20,14 +21,13 @@ class Games implements \jsonSerializable
     }
     
     /**
-     * Loads all games.
+     * Loads all Games.
      */
     public function load()
     {
-        $results = $this->gamesStore->fetch();
         $this->games = [];
-        foreach($results as $result) {
-            $this->games[] = new Game($this->gamesStore, $result);
+        foreach($this->gamesStore->fetch() as $gameValues) {
+            $this->games[] = new Game($this->gamesStore, $gameValues);
         }
         return $this;
     }

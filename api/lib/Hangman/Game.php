@@ -14,6 +14,7 @@ class Game implements \jsonSerializable
     private $gamesStore;
     
     private $attributes = ["id", "word", "guessed", "triesLeft", "status"];
+    
     private $id;
     private $word;
     private $guessed;
@@ -21,7 +22,7 @@ class Game implements \jsonSerializable
     private $status;
     
     /**
-     * Constructs a Hangman Game.
+     * Constructs a Game.
      * @param GamesStore $gamesStore
      * @param Array $gameValues [optional]
      */
@@ -86,8 +87,9 @@ class Game implements \jsonSerializable
     }
     
     /**
-     * Loads Game attributes from an array of values.
-     * @param Array $gameValues
+     * Loads Game attributes from an Array of values.
+     * @param Array $values
+     * @returns Game $this
      */
     private function loadGameFromArray(Array $values)
     {
@@ -100,7 +102,7 @@ class Game implements \jsonSerializable
     }
     
     /**
-     * Loads database information into Game.
+     * Loads values from Game with $id from Games Store.
      * @param int $id
      * @returns Game $this or null
      */
@@ -111,7 +113,7 @@ class Game implements \jsonSerializable
     }
     
     /**
-     * Create a new Game for the given word.
+     * Creates new Game with word $word.
      * @param string $word
      * @returns Game $this
      */
@@ -125,7 +127,7 @@ class Game implements \jsonSerializable
     }
     
     /**
-     * Guesses a character in the word.
+     * Guesses character $char in word.
      * @param string $char
      * @returns GuessResult
      */
@@ -166,7 +168,7 @@ class Game implements \jsonSerializable
     }
     
     /**
-     * Saves game information into database.
+     * Saves Game values into Games Store.
      */
     private function save()
     {

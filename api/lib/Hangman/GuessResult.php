@@ -16,7 +16,7 @@ class GuessResult implements \jsonSerializable
     private $game;
     
     /**
-     * Constructs a Guess Result for Hangman Game.
+     * Constructor for Guess Result.
      * @param string $result
      * @param Game $game
      */
