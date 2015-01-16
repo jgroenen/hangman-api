@@ -12,6 +12,7 @@ class Game implements \jsonSerializable
     const STATUS_SUCCESS = "success";
     
     const RESULT_GAME_CLOSED = "game closed";
+    const RESULT_ILLEGAL_CHAR = "illegal char";
     const RESULT_FAIL = "fail";
     const RESULT_SUCCESS = "success";
     
@@ -23,22 +24,6 @@ class Game implements \jsonSerializable
     private $guessed;
     private $triesLeft;
     private $status;
-    
-    /**
-     * Returns the id.
-     */
-    public function getId()
-    {
-        return $this->id;
-    }
-    
-    /**
-     * Returns the status.
-     */
-    public function getStatus()
-    {
-        return $this->status;
-    }
     
     /**
      * Constructs a game.
@@ -61,6 +46,7 @@ class Game implements \jsonSerializable
                 $this->{$attribute} = $values[$attribute];
             }
         }
+        return $this;
     }
     
     /**
@@ -80,9 +66,7 @@ class Game implements \jsonSerializable
             ":id" => $id
         ]);
         $gameValues = $stmt->fetch(\PDO::FETCH_ASSOC);
-        if ($gameValues) {
-            $this->loadGameFromArray($gameValues);
-        }
+        return $gameValues ? $this->loadGameFromArray($gameValues) : null;
     }
     
     /**
@@ -95,7 +79,7 @@ class Game implements \jsonSerializable
         $this->guessed = str_repeat(".", strlen($word));
         $this->triesLeft = 10;
         $this->status = self::STATUS_BUSY;
-        $this->save();
+        return $this->save();
     }
     
     /**
@@ -105,6 +89,18 @@ class Game implements \jsonSerializable
      */
     public function guess($char)
     {
+        if ($this->status !== self::STATUS_BUSY) {
+            return [
+                "result" => self::RESULT_GAME_CLOSED,
+                "game" => $this
+            ];
+        }
+        if (!is_string($char) || !preg_match("/^[a-z]$/", $char)) {
+            return [
+                "result" => self::RESULT_ILLEGAL_CHAR,
+                "game" => $this
+            ];
+        }
         $L = strlen($this->word);
         $result = self::RESULT_FAIL;
         $dots = 0;
@@ -130,8 +126,10 @@ class Game implements \jsonSerializable
                 }
                 break;
         }
-        $this->save();
-        return $result;
+        return [
+            "result" => $result,
+            "game" => $this->save()
+        ];
     }
     
     /**
@@ -182,6 +180,7 @@ class Game implements \jsonSerializable
                 ":id" => $this->id
             ]);
         }
+        return $this;
     }
     
     /**

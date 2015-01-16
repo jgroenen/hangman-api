@@ -31,6 +31,7 @@ class Games implements \jsonSerializable
         foreach($results as $result) {
             $this->games[] = new Game($this->pdo, $result);
         }
+        return $this;
     }
     
     /**

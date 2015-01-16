@@ -20,13 +20,12 @@ class Hangman
     }
     
     /**
-     * Starts a Hangman Game.
+     * Gets a random word from the wordfile.
      * @throws \Exception
-     * @returns Game
+     * @returns string
      */
-    public function startGame()
+    private function getRandomWord()
     {
-        $game = new Game($this->pdo);
         if (!is_file($this->wordsFilepath)) {
             throw new \Exception("no words file found");
         }
@@ -35,9 +34,17 @@ class Hangman
         if (empty($words) || empty($words->words)) {
             throw new \Exception("empty or illegal words file");
         }
-        $word = $words->words[mt_rand() % count($words->words)];
-        $game->create($word);
-        return $game;
+        return $words->words[mt_rand() % count($words->words)];
+    }
+    
+    /**
+     * Starts a Hangman Game.
+     * @returns Game
+     */
+    public function startGame()
+    {
+        $game = new Game($this->pdo);
+        return $game->create($this->getRandomWord());
     }
     
     /**
@@ -47,8 +54,7 @@ class Hangman
     public function listGames()
     {
         $games = new Games($this->pdo);
-        $games->load();
-        return $games;
+        return $games->load();
     }
     
     /**
@@ -59,30 +65,6 @@ class Hangman
     public function getGame($id)
     {
         $game = new Game($this->pdo);
-        $game->load($id);
-        return $game;
-    }
-    
-    /**
-     * Guesses a character in Hangman Game with $id.
-     * @param int $id
-     * @param string $char
-     * @returns Array
-     */
-    public function guess($id, $char)
-    {
-        $game = new Game($this->pdo);
-        $game->load($id);
-        if ($game->getStatus() !== Game::STATUS_BUSY) {
-            return [
-                "result" => Game::RESULT_GAME_CLOSED,
-                "game" => $game
-            ];
-        }
-        $result = $game->guess($char);
-        return [
-            "result" => $result,
-            "game" => $game
-        ];
+        return $game->load($id);
     }
 }

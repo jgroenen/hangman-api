@@ -6,8 +6,8 @@ ini_set('display_errors', 'On');
 require 'vendor/autoload.php';
 
 $app = new \Slim\Slim();
-$app->response->headers->set('Access-Control-Allow-Origin', '*');
 $app->response->headers->set('Content-Type', 'application/json');
+$app->response->headers->set('Access-Control-Allow-Origin', '*');
 
 $conf = (object) [
     "databaseFilepath" => __DIR__ . "/database/games.sdb",
@@ -36,7 +36,7 @@ $app->get('/games', function () use ($hangman) {
  */
 $app->get('/games/:id', function ($id) use ($app, $hangman) {
     $game = $hangman->getGame($id);
-    if (!$game->getId()) {
+    if (!$game) {
         $app->halt(404, "Game Not Found");
     }
     echo json_encode($game);
@@ -46,15 +46,15 @@ $app->get('/games/:id', function ($id) use ($app, $hangman) {
  * Guessing a letter.
  */
 $app->post('/games/:id', function ($id) use ($app, $hangman) {
+    $game = $hangman->getGame($id);
+    if (!$game) {
+        $app->halt(404, "Game Not Found");
+    }
     parse_str($app->request->getBody(), $params);
     if (empty($params["char"])) {
         $app->halt(412, "missing parameter char");
     }
-    $char = $params["char"];
-    if (!is_string($char) || !preg_match("/^[a-z]$/", $char)) {
-        $app->halt(412, "illegal input value for parameter char");
-    }
-    echo json_encode($hangman->guess($id, $char));
+    echo json_encode($game->guess($params["char"]));
 });
 
 $app->run();
