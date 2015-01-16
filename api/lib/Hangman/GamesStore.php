@@ -7,6 +7,8 @@ namespace Hangman;
  */
 class GamesStore
 {
+    private $pdo;
+    
     /**
      * Constructs a Games Store for Hangman Games.
      * @param PDO $pdo

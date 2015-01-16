@@ -8,33 +8,17 @@ namespace Hangman;
 class Hangman
 {
     private $gamesStore;
-    private $wordsFilepath;
+    private $wordsStore;
     
     /**
      * Constructor for Hangman.
+     * @param GamesStore $gamesStore
+     * @param WordsStore $wordsStore
      */
-    public function __construct(GamesStore $gamesStore, $wordsFilepath)
+    public function __construct(GamesStore $gamesStore, WordsStore $wordsStore)
     {
         $this->gamesStore = $gamesStore;
-        $this->wordsFilepath = $wordsFilepath;
-    }
-    
-    /**
-     * Gets a random word from the wordfile.
-     * @throws \Exception
-     * @returns string
-     */
-    private function getRandomWord()
-    {
-        if (!is_file($this->wordsFilepath)) {
-            throw new \Exception("no words file found");
-        }
-        $wordsJson = file_get_contents($this->wordsFilepath);
-        $words = json_decode($wordsJson);
-        if (empty($words) || empty($words->words)) {
-            throw new \Exception("empty or illegal words file");
-        }
-        return $words->words[mt_rand() % count($words->words)];
+        $this->wordsStore = $wordsStore;
     }
     
     /**
@@ -44,7 +28,7 @@ class Hangman
     public function startGame()
     {
         $game = new Game($this->gamesStore);
-        return $game->create($this->getRandomWord());
+        return $game->create($this->wordsStore->getRandomWord());
     }
     
     /**
