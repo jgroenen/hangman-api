@@ -64,6 +64,7 @@ class GameTest extends PHPUnit_Framework_TestCase
             "status" => \Hangman\Game::STATUS_BUSY
         ]);
         $result = $game->guess("s");
+        $this->assertInstanceOf('\Hangman\GuessResult', $result);
         $this->assertEquals($game->getStatus(), \Hangman\Game::STATUS_SUCCESS);
         $this->assertEquals($game->getGuessed(), "testword");
         $this->assertEquals($game->getTriesLeft(), 5);
@@ -82,6 +83,7 @@ class GameTest extends PHPUnit_Framework_TestCase
             "status" => \Hangman\Game::STATUS_BUSY
         ]);
         $result = $game->guess("x");
+        $this->assertInstanceOf('\Hangman\GuessResult', $result);
         $this->assertEquals($game->getStatus(), \Hangman\Game::STATUS_BUSY);
         $this->assertEquals($game->getGuessed(), "te.tword");
         $this->assertEquals($game->getTriesLeft(), 4);
