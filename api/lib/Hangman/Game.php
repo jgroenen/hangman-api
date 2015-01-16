@@ -11,11 +11,6 @@ class Game implements \jsonSerializable
     const STATUS_FAIL = "fail";
     const STATUS_SUCCESS = "success";
     
-    const RESULT_GAME_CLOSED = "game closed";
-    const RESULT_ILLEGAL_CHAR = "illegal char";
-    const RESULT_FAIL = "fail";
-    const RESULT_SUCCESS = "success";
-    
     private $gamesStore;
     
     private $attributes = ["id", "word", "guessed", "triesLeft", "status"];
@@ -26,57 +21,9 @@ class Game implements \jsonSerializable
     private $status;
     
     /**
-     * Setter for id.
-     */
-    public function setId($id)
-    {
-        $this->id = $id;
-    }
-    
-    /**
-     * Getter for id.
-     */
-    public function getId()
-    {
-        return $this->id;
-    }
-    
-    /**
-     * Getter for word.
-     */
-    public function getWord()
-    {
-        return $this->word;
-    }
-    
-    /**
-     * Getter for guessed.
-     */
-    public function getGuessed()
-    {
-        return $this->guessed;
-    }
-    
-    /**
-     * Getter for triesLeft.
-     */
-    public function getTriesLeft()
-    {
-        return $this->triesLeft;
-    }
-    
-    /**
-     * Getter for status.
-     */
-    public function getStatus()
-    {
-        return $this->status;
-    }
-    
-    /**
-     * Constructs a game.
-     * @param GamesStore $pdo
-     * @param Array $game [optional]
+     * Constructs a Hangman Game.
+     * @param GamesStore $gamesStore
+     * @param Array $gameValues [optional]
      */
     public function __construct(GamesStore $gamesStore, Array $gameValues = [])
     {
@@ -85,7 +32,62 @@ class Game implements \jsonSerializable
     }
     
     /**
-     * Loads game attributes from an array of values.
+     * Setter for id.
+     * @param int $id
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
+    }
+    
+    /**
+     * Getter for id.
+     * @returns int id
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+    
+    /**
+     * Getter for word.
+     * @returns string word
+     */
+    public function getWord()
+    {
+        return $this->word;
+    }
+    
+    /**
+     * Getter for guessed.
+     * @returns string guessed
+     */
+    public function getGuessed()
+    {
+        return $this->guessed;
+    }
+    
+    /**
+     * Getter for triesLeft.
+     * @returns int triesLeft
+     */
+    public function getTriesLeft()
+    {
+        return $this->triesLeft;
+    }
+    
+    /**
+     * Getter for status.
+     * @returns string status
+     */
+    public function getStatus()
+    {
+        return $this->status;
+    }
+    
+    /**
+     * Loads Game attributes from an array of values.
+     * @param Array $gameValues
      */
     private function loadGameFromArray(Array $values)
     {
@@ -98,9 +100,9 @@ class Game implements \jsonSerializable
     }
     
     /**
-     * Loads database information into game.
+     * Loads database information into Game.
      * @param int $id
-     * @returns Game
+     * @returns Game $this or null
      */
     public function load($id)
     {
@@ -109,8 +111,9 @@ class Game implements \jsonSerializable
     }
     
     /**
-     * Create a new game for the given word.
+     * Create a new Game for the given word.
      * @param string $word
+     * @returns Game $this
      */
     public function create($word)
     {
@@ -124,51 +127,42 @@ class Game implements \jsonSerializable
     /**
      * Guesses a character in the word.
      * @param string $char
-     * @returns RESULT_SUCCESS || RESULT_FAIL
+     * @returns GuessResult
      */
     public function guess($char)
     {
         if ($this->status !== self::STATUS_BUSY) {
-            return [
-                "result" => self::RESULT_GAME_CLOSED,
-                "game" => $this
-            ];
+            return new GuessResult(GuessResult::RESULT_GAME_CLOSED, $this);
         }
         if (!is_string($char) || !preg_match("/^[a-z]$/", $char)) {
-            return [
-                "result" => self::RESULT_ILLEGAL_CHAR,
-                "game" => $this
-            ];
+            return new GuessResult(GuessResult::RESULT_ILLEGAL_CHAR, $this);
         }
         $L = strlen($this->word);
-        $result = self::RESULT_FAIL;
+        $resultCode = GuessResult::RESULT_FAIL;
         $dots = 0;
         for ($i = 0; $i < $L; ++$i) {
             if ($this->word[$i] === $char && $this->guessed[$i] !== $char) {
                 $this->guessed[$i] = $char;
-                $result = self::RESULT_SUCCESS;
+                $resultCode = GuessResult::RESULT_SUCCESS;
             }
             if ($this->guessed[$i] === ".") {
                 $dots++;
             }
         }
-        switch ($result) {
-            case self::RESULT_FAIL:
+        switch ($resultCode) {
+            case GuessResult::RESULT_FAIL:
                 $this->triesLeft--;
                 if ($this->triesLeft <= 0) {
                     $this->status = self::STATUS_FAIL;
                 }
                 break;
-            case self::RESULT_SUCCESS:
+            case GuessResult::RESULT_SUCCESS:
                 if (!$dots) {
                     $this->status = self::STATUS_SUCCESS;
                 }
                 break;
         }
-        return [
-            "result" => $result,
-            "game" => $this->save()
-        ];
+        return new GuessResult($resultCode, $this->save());
     }
     
     /**
