@@ -7,15 +7,15 @@ namespace Hangman;
  */
 class Hangman
 {
-    private $pdo;
+    private $gamesStore;
     private $wordsFilepath;
     
     /**
      * Constructor for Hangman.
      */
-    public function __construct(\PDO $pdo, $wordsFilepath)
+    public function __construct(GamesStore $gamesStore, $wordsFilepath)
     {
-        $this->pdo = $pdo;
+        $this->gamesStore = $gamesStore;
         $this->wordsFilepath = $wordsFilepath;
     }
     
@@ -43,7 +43,7 @@ class Hangman
      */
     public function startGame()
     {
-        $game = new Game($this->pdo);
+        $game = new Game($this->gamesStore);
         return $game->create($this->getRandomWord());
     }
     
@@ -53,7 +53,7 @@ class Hangman
      */
     public function listGames()
     {
-        $games = new Games($this->pdo);
+        $games = new Games($this->gamesStore);
         return $games->load();
     }
     
@@ -64,7 +64,7 @@ class Hangman
      */
     public function getGame($id)
     {
-        $game = new Game($this->pdo);
+        $game = new Game($this->gamesStore);
         return $game->load($id);
     }
 }

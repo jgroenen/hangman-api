@@ -16,7 +16,7 @@ class Game implements \jsonSerializable
     const RESULT_FAIL = "fail";
     const RESULT_SUCCESS = "success";
     
-    private $pdo;
+    private $gamesStore;
     
     private $attributes = ["id", "word", "guessed", "triesLeft", "status"];
     private $id;
@@ -26,13 +26,61 @@ class Game implements \jsonSerializable
     private $status;
     
     /**
+     * Setter for id.
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
+    }
+    
+    /**
+     * Getter for id.
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+    
+    /**
+     * Getter for word.
+     */
+    public function getWord()
+    {
+        return $this->word;
+    }
+    
+    /**
+     * Getter for guessed.
+     */
+    public function getGuessed()
+    {
+        return $this->guessed;
+    }
+    
+    /**
+     * Getter for triesLeft.
+     */
+    public function getTriesLeft()
+    {
+        return $this->triesLeft;
+    }
+    
+    /**
+     * Getter for status.
+     */
+    public function getStatus()
+    {
+        return $this->status;
+    }
+    
+    /**
      * Constructs a game.
-     * @param PDO $pdo
+     * @param GamesStore $pdo
      * @param Array $game [optional]
      */
-    public function __construct(\PDO $pdo, Array $gameValues = [])
+    public function __construct(GamesStore $gamesStore, Array $gameValues = [])
     {
-        $this->pdo = $pdo;
+        $this->gamesStore = $gamesStore;
         $this->loadGameFromArray($gameValues);
     }
     
@@ -56,16 +104,7 @@ class Game implements \jsonSerializable
      */
     public function load($id)
     {
-        $sql = "
-            SELECT * FROM games
-            WHERE id = :id
-            LIMIT 1
-        ";
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute([
-            ":id" => $id
-        ]);
-        $gameValues = $stmt->fetch(\PDO::FETCH_ASSOC);
+        $gameValues = $this->gamesStore->fetch($id);
         return $gameValues ? $this->loadGameFromArray($gameValues) : null;
     }
     
@@ -137,49 +176,7 @@ class Game implements \jsonSerializable
      */
     private function save()
     {
-        if (empty($this->id)) {
-            $sql = "
-                INSERT INTO games (
-                    word,
-                    guessed,
-                    triesLeft,
-                    status
-                )
-                VALUES (
-                    :word,
-                    :guessed,
-                    :triesLeft,
-                    :status
-                )
-            ";
-            $stmt = $this->pdo->prepare($sql);
-            $stmt->execute([
-                ":word" => $this->word,
-                ":guessed" => $this->guessed,
-                ":triesLeft" => $this->triesLeft,
-                ":status" => $this->status
-            ]);
-            $this->id = $this->pdo->lastInsertId();
-        } else {
-            $sql = "
-                UPDATE games
-                SET
-                    word = :word,
-                    guessed = :guessed,
-                    triesLeft = :triesLeft,
-                    status = :status
-                WHERE
-                    id = :id
-            ";
-            $stmt = $this->pdo->prepare($sql);
-            $stmt->execute([
-                ":word" => $this->word,
-                ":guessed" => $this->guessed,
-                ":triesLeft" => $this->triesLeft,
-                ":status" => $this->status,
-                ":id" => $this->id
-            ]);
-        }
+        $this->gamesStore->save($this);
         return $this;
     }
     

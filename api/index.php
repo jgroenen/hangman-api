@@ -15,7 +15,8 @@ $conf = (object) [
 ];
 
 $pdo = new PDO("sqlite:{$conf->databaseFilepath}");
-$hangman = new \Hangman\Hangman($pdo, $conf->wordsFilepath);
+$gamesStore = new \Hangman\GamesStore($pdo);
+$hangman = new \Hangman\Hangman($gamesStore, $conf->wordsFilepath);
 
 /**
  * Start a new game.

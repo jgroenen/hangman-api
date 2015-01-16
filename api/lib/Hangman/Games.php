@@ -7,15 +7,15 @@ namespace Hangman;
  */
 class Games implements \jsonSerializable
 {
-    private $pdo;
+    private $gamesStore;
     private $games;
     
     /**
      * Constructor for Games of Hangman.
      */
-    public function __construct(\PDO $pdo)
+    public function __construct(GamesStore $gamesStore)
     {
-        $this->pdo = $pdo;
+        $this->gamesStore = $gamesStore;
         $this->games = [];
     }
     
@@ -24,12 +24,10 @@ class Games implements \jsonSerializable
      */
     public function load()
     {
-        $sql = "SELECT * FROM games";
-        $stmt = $this->pdo->query($sql);
-        $results = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        $results = $this->gamesStore->fetch();
         $this->games = [];
         foreach($results as $result) {
-            $this->games[] = new Game($this->pdo, $result);
+            $this->games[] = new Game($this->gamesStore, $result);
         }
         return $this;
     }
